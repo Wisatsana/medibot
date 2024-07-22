@@ -93,6 +93,22 @@ def on_click_callback():
 # Fungsi utama untuk menjalankan aplikasi Streamlit
 def app():
     load_css()
+    
+    # Autentikasi sederhana dengan kode password
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+    chatpass = os.getenv("chatpass")
+    if not st.session_state.authenticated:
+        password = st.text_input("Masukkan kode password:", type="password")
+        if password == chatpass:
+            st.session_state.authenticated = True
+            st.experimental_rerun()
+        elif password == "":
+            return
+        else:
+            st.error("Kode password salah.")
+            return
+
     initialize_session_state()
     
     # Desain tampilan percakapan
