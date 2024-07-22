@@ -99,14 +99,14 @@ def app():
         st.session_state.authenticated = False
     chatpass = os.getenv("chatpass")
     if not st.session_state.authenticated:
-        password = st.text_input("Masukkan kode password:", type="password")
+        password = st.text_input("Masukkan kode akses:", type="password")
         if password == chatpass:
             st.session_state.authenticated = True
             st.experimental_rerun()
         elif password == "":
             return
         else:
-            st.error("Kode password salah.")
+            st.error("Kode akses salah.")
             return
 
     initialize_session_state()
