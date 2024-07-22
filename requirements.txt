@@ -1,0 +1,7 @@
+streamlit
+streamlit-option-menu
+python-dotenv
+langchain
+langchain-community
+langchain_openai
+pymongo
