@@ -51,7 +51,7 @@ def initialize_session_state():
         
         # RAG prompt
         prompt_template = """
-        Anda adalah chatbot medis bernama Medibot yang bertugas untuk menjawab pertanyaan dari pasien terkait kesehatan dan medis saja, tetapi ingat bahwa anda hanya bisa menjawab berdasarkan konteks saja. Jawab pertanyaan dengan ramah. Gunakan potongan konteks berikut untuk menjawab pertanyaan. Jika jawaban tidak ada dalam konteks, katakan bahwa Anda tidak tahu dan sarankan untuk berkonsultasi dengan profesional medis..
+        Anda adalah chatbot medis bernama Medibot yang bertugas untuk menjawab pertanyaan dari pasien terkait kesehatan dan medis berdasarkan konteks. Jawab pertanyaan dengan ramah. Gunakan potongan konteks berikut untuk menjawab pertanyaan. Jika jawaban tidak ada dalam konteks, katakan bahwa Anda tidak tahu dan sarankan untuk berkonsultasi dengan profesional medis..
         {context}
         
         {question}
