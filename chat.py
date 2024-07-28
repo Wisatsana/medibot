@@ -102,7 +102,7 @@ def app():
         password = st.text_input("Masukkan kode akses:", type="password")
         if password == chatpass:
             st.session_state.authenticated = True
-            st.experimental_rerun()
+            st.rerun()
         elif password == "":
             return
         else:
