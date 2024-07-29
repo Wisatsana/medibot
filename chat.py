@@ -62,7 +62,7 @@ def initialize_session_state():
         )
 
         qa = RetrievalQA.from_chain_type(
-            llm=OpenAI(max_tokens=200),
+            llm=OpenAI(temperature=0.3, max_tokens=200),
             chain_type="stuff",
             retriever=retriever,
             return_source_documents=True,
