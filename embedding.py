@@ -7,8 +7,8 @@ from pymongo import MongoClient
 
 MONGO_URI = os.environ["MONGO_URI"]
 
-# Note that if you change this, you also need to change it in `rag_mongo/chain.py`
-DB_NAME = "medibot"
+# Konfigurasi Atlas mongodb
+DB_NAME = "vectorstores"
 COLLECTION_NAME = "medibot"
 ATLAS_VECTOR_SEARCH_INDEX_NAME = "default"
 EMBEDDING_FIELD_NAME = "embedding"
@@ -20,18 +20,37 @@ if __name__ == "__main__":
     # Path relatif ke file PDF di direktori data
     pdf_path = os.path.join(os.path.dirname(__file__), "data", "The_GALE_ENCYCLOPEDIA_of_MEDICINE_SECOND.pdf")
     
-    # Load docs
+    # Memuat dokumen
     loader = PyPDFLoader(pdf_path)
-    data = loader.load()
+    pages = loader.load()
 
-    # Split docs
+    # membagi dokumen menjadi chunk
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
-    docs = text_splitter.split_documents(data)
+    texts = text_splitter.split_documents(pages)
+    
+    # Log jumlah dokumen yang di-split
+    print(f"Jumlah dokumen yang di-split: {len(texts)}")
 
-    # Insert the documents in MongoDB Atlas Vector Search
-    _ = MongoDBAtlasVectorSearch.from_documents(
-        documents=docs,
-        embedding=OpenAIEmbeddings(disallowed_special=()),
+    # ekstrak teks untuk setiap dokumen
+    documents_texts = [doc.page_content for doc in texts]
+
+    # Menghasilkan embeddings untuk setiap document
+    embeddings = OpenAIEmbeddings(model='text-embedding-3-small', disallowed_special=())
+    embedded_texts = embeddings.embed_documents(documents_texts)
+
+    # Memasukkan document ke MongoDB Atlas Vector Search
+    vector_search = MongoDBAtlasVectorSearch(
         collection=MONGODB_COLLECTION,
-        index_name=ATLAS_VECTOR_SEARCH_INDEX_NAME,
+        embedding=embeddings,
     )
+    
+    # Log hasil embedding dan masukkan ke dalam koleksi
+    for i, doc in enumerate(texts):
+        print(f"Dokumen {i}: {doc}")
+        # Pastikan _id adalah string
+        doc_id = str(i)
+        vector_search.add_documents(documents=[doc], embeddings=[embedded_texts[i]], ids=[doc_id])
+        print(f"Dokumen {i} berhasil dimasukkan ke dalam koleksi dengan embedding.")
+
+    # Log total dokumen yang berhasil dimasukkan
+    print(f"Total dokumen yang berhasil dimasukkan: {len(texts)}")
