@@ -30,8 +30,8 @@ def create_vector_search():
     mongo_uri = os.getenv("MONGO_URI")
     vector_search = MongoDBAtlasVectorSearch.from_connection_string(
         mongo_uri,
-        "medibot.medibot",
-        OpenAIEmbeddings(),
+        "vectorstores.medibot",
+        OpenAIEmbeddings(model='text-embedding-3-small', disallowed_special=()),
         index_name="default"
     )
     return vector_search
@@ -51,7 +51,8 @@ def initialize_session_state():
         
         # RAG prompt
         prompt_template = """
-        Anda adalah chatbot medis bernama Medibot yang bertugas untuk menjawab pertanyaan dari pasien terkait medis. Jawab pertanyaan dengan ramah. Hanya gunakan potongan konteks berikut untuk menjawab pertanyaan. Jika jawaban tidak ada dalam konteks, katakan bahwa Anda tidak tahu.
+        Anda adalah chatbot medis bernama Medibot yang bertugas untuk menjawab pertanyaan dari pasien terkait medis. Jawablah pertanyaan dengan pasien ramah.
+        Gunakan potongan konteks berikut untuk menjawab pertanyaan. Jika jawaban tidak ada dalam konteks, katakan bahwa Anda tidak tahu.
         {context}
         
         {question}
@@ -61,7 +62,7 @@ def initialize_session_state():
         )
 
         qa = RetrievalQA.from_chain_type(
-            llm=OpenAI(max_tokens=200, temperature=0),
+            llm=OpenAI(max_tokens=200),
             chain_type="stuff",
             retriever=retriever,
             return_source_documents=True,
