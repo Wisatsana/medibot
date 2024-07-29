@@ -51,18 +51,19 @@ def initialize_session_state():
         
         # RAG prompt
         prompt_template = """
-        Anda adalah chatbot medis bernama Medibot yang bertugas untuk menjawab pertanyaan dari pasien terkait medis. Jawablah pertanyaan dengan pasien ramah.
+        System : Anda adalah chatbot medis bernama Medibot yang bertugas untuk menjawab pertanyaan dari pasien terkait medis. Jawablah pertanyaan dengan pasien ramah.
         Gunakan potongan konteks berikut untuk menjawab pertanyaan. Jika jawaban tidak ada dalam konteks, katakan bahwa Anda tidak tahu.
-        {context}
         
-        {question}
-        """
+        Context: {context}
+        
+        Human:{question}
+        Medibot:"""
         PROMPT = PromptTemplate(
             template=prompt_template, input_variables=["context", "question"]
         )
 
         qa = RetrievalQA.from_chain_type(
-            llm=OpenAI(temperature=0.3, max_tokens=200),
+            llm=OpenAI(max_tokens=200),
             chain_type="stuff",
             retriever=retriever,
             return_source_documents=True,
