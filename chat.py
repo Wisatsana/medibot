@@ -5,7 +5,7 @@ from typing import Literal
 from langchain_community.callbacks.manager import get_openai_callback
 from langchain.chains.retrieval_qa.base import RetrievalQA
 from langchain_community.llms.openai import OpenAI
-from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain_community.vectorstores import MongoDBAtlasVectorSearch
 import streamlit.components.v1 as components
@@ -31,8 +31,7 @@ def create_vector_search():
     vector_search = MongoDBAtlasVectorSearch.from_connection_string(
         mongo_uri,
         "vectorstores.medibot",
-        OpenAIEmbeddings(model='text-embedding-3-small', disallowed_special=()),
-        index_name="default"
+        OpenAIEmbeddings(model='text-embedding-3-small', disallowed_special=())
     )
     return vector_search
 
@@ -51,7 +50,7 @@ def initialize_session_state():
         
         # RAG prompt
         prompt_template = """
-        System : Anda adalah chatbot medis bernama Medibot yang bertugas untuk menjawab pertanyaan dari pasien terkait medis. Jawablah pertanyaan pasien dengan ramah.
+        system : Anda adalah chatbot medis bernama Medibot dibuat oleh rehan yang bertugas untuk menjawab pertanyaan dari pasien terkait medis. Jawablah pertanyaan dengan pasien ramah.
         Gunakan potongan konteks berikut untuk menjawab pertanyaan. Jika jawaban tidak ada dalam konteks, katakan bahwa Anda tidak tahu.
         
         Context: {context}
@@ -63,13 +62,11 @@ def initialize_session_state():
         )
 
         qa = RetrievalQA.from_chain_type(
-            llm=OpenAI(temperature=0.7, max_tokens=200),
+            llm=OpenAI(max_tokens=200),
             chain_type="stuff",
             retriever=retriever,
-            return_source_documents=True,
             chain_type_kwargs={"prompt": PROMPT}
         )
-        
         st.session_state.conversation = qa
 
 # Fungsi callback untuk menangani pengiriman formulir
@@ -90,6 +87,10 @@ def on_click_callback():
         
         # Reset input pesan setelah mengirim
         st.session_state.human_prompt = ""
+        
+        # Cek apakah token_count melebihi batas
+        if st.session_state.token_count >= 1500:
+            st.session_state.limit_reached = True
 
 # Fungsi utama untuk menjalankan aplikasi Streamlit
 def app():
@@ -112,6 +113,10 @@ def app():
 
     initialize_session_state()
     
+    # Inisialisasi flag limit_reached jika belum ada
+    if "limit_reached" not in st.session_state:
+        st.session_state.limit_reached = False
+    
     # Desain tampilan percakapan
     st.title("Chatbot Kesehatan MediBot 🤖")
     chat_placeholder = st.container()
@@ -133,13 +138,17 @@ def app():
 
     with prompt_placeholder:
         cols = st.columns((6, 1))
-        cols[0].text_input("Chat", value="", label_visibility="collapsed", key="human_prompt")
-        cols[1].form_submit_button("Submit", type="primary", on_click=on_click_callback)
+        cols[0].text_input("Chat", value="", label_visibility="collapsed", key="human_prompt", disabled=st.session_state.limit_reached)
+        cols[1].form_submit_button("Submit", type="primary", on_click=on_click_callback, disabled=st.session_state.limit_reached)
 
     # Menampilkan jumlah token yang dipakai
     credit_card_placeholder.caption(f"""
     Used {st.session_state.token_count} tokens
     """)
+    
+    # Menampilkan pesan peringatan jika limit tercapai
+    if st.session_state.limit_reached:
+        st.warning("Mohon maaf jumlah penggunaan token anda telah mencapai limit sesi percakapan, refresh halaman untuk menggunakanya lagi.")
     
     # Menambahkan fungsi tombol enter pada keyboard untuk mengirim pesan
     components.html("""
