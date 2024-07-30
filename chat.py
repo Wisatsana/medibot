@@ -46,7 +46,7 @@ def initialize_session_state():
         vector_search = create_vector_search()
         retriever = vector_search.as_retriever(
             search_type="similarity",
-            search_kwargs={"k": 100, "post_filter_pipeline": [{"$limit": 1}]}
+            search_kwargs={"k": 1}
         )
         
         # RAG prompt
@@ -63,7 +63,7 @@ def initialize_session_state():
         )
 
         qa = RetrievalQA.from_chain_type(
-            llm=OpenAI(max_tokens=200),
+            llm=OpenAI(temperature=0.7, max_tokens=200),
             chain_type="stuff",
             retriever=retriever,
             return_source_documents=True,
