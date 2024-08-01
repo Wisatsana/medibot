@@ -41,6 +41,8 @@ def initialize_session_state():
         st.session_state.history = []
     if "token_count" not in st.session_state:
         st.session_state.token_count = 0
+    if "limit_reached" not in st.session_state:
+        st.session_state.limit_reached = False
     if "conversation" not in st.session_state:
         vector_search = create_vector_search()
         retriever = vector_search.as_retriever(
@@ -95,27 +97,7 @@ def on_click_callback():
 # Fungsi utama untuk menjalankan aplikasi Streamlit
 def app():
     load_css()
-    
-    # Autentikasi sederhana dengan kode password
-    if "authenticated" not in st.session_state:
-        st.session_state.authenticated = False
-    chatpass = os.getenv("chatpass")
-    if not st.session_state.authenticated:
-        password = st.text_input("Masukkan kode akses:", type="password")
-        if password == chatpass:
-            st.session_state.authenticated = True
-            st.rerun()
-        elif password == "":
-            return
-        else:
-            st.error("Kode akses salah.")
-            return
-
     initialize_session_state()
-    
-    # Inisialisasi flag limit_reached jika belum ada
-    if "limit_reached" not in st.session_state:
-        st.session_state.limit_reached = False
     
     # Desain tampilan percakapan
     st.title("Chatbot Kesehatan MediBot 🤖")
