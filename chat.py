@@ -46,8 +46,8 @@ def initialize_session_state():
     if "conversation" not in st.session_state:
         vector_search = create_vector_search()
         retriever = vector_search.as_retriever(
-            search_type="similarity",
-            search_kwargs={"k": 1}
+            search_type="similarity_score_threshold",
+            search_kwargs={"k": 1,"score_threshold": 0.5}
         )
         
         # RAG prompt
@@ -64,7 +64,7 @@ def initialize_session_state():
         )
 
         qa = RetrievalQA.from_chain_type(
-            llm=OpenAI(temperature=0.5, max_tokens=200),
+            llm=OpenAI(max_tokens=200),
             chain_type="stuff",
             retriever=retriever,
             chain_type_kwargs={"prompt": PROMPT}
