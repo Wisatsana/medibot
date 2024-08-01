@@ -46,14 +46,14 @@ def initialize_session_state():
     if "conversation" not in st.session_state:
         vector_search = create_vector_search()
         retriever = vector_search.as_retriever(
-            search_type="similarity_score_threshold",
-            search_kwargs={"k": 1,"score_threshold": 0.5}
+            search_type="similarity",
+            search_kwargs={"k": 1}
         )
         
         # RAG prompt
         prompt_template = """
-        system : Anda adalah chatbot medis bernama Medibot yang bertugas untuk menjawab pertanyaan dari pasien terkait medis. Jawablah pertanyaan dengan pasien ramah.
-        Gunakan potongan konteks berikut untuk menjawab pertanyaan. Jika jawaban tidak ada dalam konteks, katakan bahwa Anda tidak tahu. Jangan mencoba membuat jawaban anda sendiri.
+        system : Anda adalah chatbot medis bernama Medibot yang bertugas untuk menjawab pertanyaan dari pasien hanya seputar medis. Jawablah pertanyaan dengan pasien ramah.
+        Gunakan potongan konteks berikut untuk menjawab pertanyaan. Jika konteks yang diberikan tidak sesuai dengan pertanyaan, katakan bahwa Anda tidak memiliki pegetahuan tentag hal terebut.
         
         Context: {context}
         
