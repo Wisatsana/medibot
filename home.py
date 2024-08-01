@@ -26,7 +26,7 @@ def app():
     st.markdown("## Fitur Unggulan")
     st.markdown("""
     ### Pengetahuan Medis Terpercaya
-    Chatbot kami dilengkapi dengan basis data pengetahuan medis yang bisa di cek [disini](https://www.academia.edu/32752835/The_GALE_ENCYCLOPEDIA_of_MEDICINE_SECOND_EDITION).
+    Chatbot kami dilengkapi dengan basis data pengetahuan medis yang bisa di cek [disini](https://drive.google.com/file/d/18Ksmk1rkpQ7pVhg9kSqNhawDU28cwjYT/view?usp=drive_link).
 
     ### Akses 24/7
     Dapatkan konsultasi kapan saja, bahkan di luar jam kerja.
